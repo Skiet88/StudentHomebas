@@ -1,15 +1,14 @@
-import axios from 'axios';
-
+//import axiosInstance from './axiosInstance'; // Path to the axiosInstance file
+import axiosInstance from 'axios';
 class PropertyService {
     constructor() {
         this.apiUrl = '/api/StudentHomeBas/Property';
     }
 
-
     async deleteProperty(propertyID) {
         const url = `${this.apiUrl}/delete/${propertyID}`;
         try {
-            await axios.delete(url);
+            await axiosInstance.delete(url);
             return propertyID;
         } catch (error) {
             console.error('Error deleting property:', error);
@@ -17,11 +16,10 @@ class PropertyService {
         }
     }
 
-
     async readProperty(propertyID) {
         const url = `${this.apiUrl}/read/${propertyID}`;
         try {
-            const response = await axios.get(url);
+            const response = await axiosInstance.get(url);
             return response.data;
         } catch (error) {
             console.error('Error reading property:', error);
@@ -29,11 +27,10 @@ class PropertyService {
         }
     }
 
-
     async saveProperty(property) {
         const url = `${this.apiUrl}/create`;
         try {
-            const response = await axios.post(url, property);
+            const response = await axiosInstance.post(url, property);
             return response.data;
         } catch (error) {
             console.error('Error saving property:', error);
@@ -41,11 +38,10 @@ class PropertyService {
         }
     }
 
-
     async updateProperty(property) {
         const url = `${this.apiUrl}/update`;
         try {
-            const response = await axios.post(url, property);
+            const response = await axiosInstance.post(url, property);
             return response.data;
         } catch (error) {
             console.error('Error updating property:', error);
@@ -53,11 +49,10 @@ class PropertyService {
         }
     }
 
-
     async fetchAllProperties() {
         const url = `${this.apiUrl}/getAll`;
         try {
-            const response = await axios.get(url);
+            const response = await axiosInstance.get(url);
             return response.data;
         } catch (error) {
             console.error('Error fetching properties:', error);

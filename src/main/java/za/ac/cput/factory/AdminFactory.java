@@ -26,7 +26,7 @@ public class AdminFactory {
                 .setLastName(lastName)
                 .build();
 
-        return new Admin.Builder()
+        return new Admin.AdminBuilder()
                 .setUserId(adminId)
                 .setName(name)
                 .setGender(gender)
@@ -52,7 +52,7 @@ public class AdminFactory {
                 .setLastName(lastName)
                 .build();
 
-        return new Admin.Builder()
+        return new Admin.AdminBuilder()
                 .setUserId(adminId)
                 .setName(name)
                 .setGender(gender)

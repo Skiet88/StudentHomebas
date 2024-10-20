@@ -69,19 +69,19 @@ class StudentServiceTest {
         contact1 = new Contact.Builder().setAddress(address1).setEmail("mphumzimbula@gmail.com").setPhoneNumber("0658436358").build();
         academicDetails1 = new AcademicDetails.Builder().setAcademicDetailsID("1").setInstituteName("CPUT").setYearOfStudy(3).setProgramOfStudy("DICT:Application Development").build();
 
-        student1 = StudentFactory.buildStudent(1L, "Mpumzi", "Mbula", "Male", LocalDate.of(2000, 06, 20), "20Mphmbu16!", academicDetails1, contact1, studentDocuments1);
+        student1 = StudentFactory.buildStudent(1L, "Mpumzi", "Mbula", "Male", LocalDate.of(2000, 06, 20), "m@123", academicDetails1, contact1, studentDocuments1);
 
         //Student 2
         address2 = AddressFactory.buildAddress("7556 Jan Smart", "BrackenFell", "Cape Town", "7750");
         contact2 = new Contact.Builder().setAddress(address2).setEmail("kaileymansoon@gmail.com").setPhoneNumber("0756355778").build();
         academicDetails2 = new AcademicDetails.Builder().setAcademicDetailsID("2").setInstituteName("CPUT").setYearOfStudy(3).setProgramOfStudy("DICT:Application Development").build();
-        student2 = StudentFactory.buildStudent(2L, "Kailey", "Mansoon", "Zhubhear", "Male", LocalDate.of(2002, 05, 17), "Mpu@2022!!", academicDetails2, contact2, studentDocuments2);
+        student2 = StudentFactory.buildStudent(4L, "Kailey", "Mansoon", "Zhubhear", "Male", LocalDate.of(2002, 05, 17), "k@123", academicDetails2, contact2, studentDocuments2);
 
         //Student 3
         address3 = AddressFactory.buildAddress("20267 Ben Moloise", "Khayelitsha", "Cape Town", "7784");
         contact3 = new Contact.Builder().setAddress(address3).setEmail("vxayiya@gmail.com").setPhoneNumber("0756356578").build();
         academicDetails3 = new AcademicDetails.Builder().setAcademicDetailsID("3").setInstituteName("CPUT").setYearOfStudy(1).setProgramOfStudy("DT:Diploma in Tourism").build();
-        student3 = StudentFactory.buildStudent(3L, "Vuyokazi", "Joy", "Xayiya", "Male", LocalDate.of(2001, 02, 13), "VuyoYiya@2022!!", academicDetails3, contact3, studentDocuments3);
+        student3 = StudentFactory.buildStudent(5L, "Vuyokazi", "Joy", "Xayiya", "Male", LocalDate.of(2001, 02, 13), "v@123", academicDetails3, contact3, studentDocuments3);
 
 
     }

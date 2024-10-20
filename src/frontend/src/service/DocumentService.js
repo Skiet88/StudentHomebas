@@ -1,4 +1,5 @@
-import axios from 'axios';
+//import axiosInstance from './axiosInstance'; // Path to the axiosInstance file
+import axiosInstance from 'axios';
 
 class DocumentService {
     constructor() {
@@ -9,7 +10,7 @@ class DocumentService {
     async saveDocument(document) {
         const url = `${this.apiUrl}/save`;
         try {
-            const response = await axios.post(url, document);
+            const response = await axiosInstance.post(url, document);
             return response.data;
         } catch (error) {
             console.error('Error saving document:', error);
@@ -21,7 +22,7 @@ class DocumentService {
     async readDocument(documentID) {
         const url = `${this.apiUrl}/read/${documentID}`;
         try {
-            const response = await axios.get(url);
+            const response = await axiosInstance.get(url);
             return response.data;
         } catch (error) {
             console.error('Error reading document:', error);
@@ -33,7 +34,7 @@ class DocumentService {
     async updateDocument(document) {
         const url = `${this.apiUrl}/update`;
         try {
-            const response = await axios.put(url, document);
+            const response = await axiosInstance.put(url, document);
             return response.data;
         } catch (error) {
             console.error('Error updating document:', error);
@@ -45,7 +46,7 @@ class DocumentService {
     async deleteDocument(documentID) {
         const url = `${this.apiUrl}/delete/${documentID}`;
         try {
-            const response = await axios.delete(url);
+            const response = await axiosInstance.delete(url);
             return response.data;
         } catch (error) {
             console.error('Error deleting document:', error);
@@ -57,7 +58,7 @@ class DocumentService {
     async fetchAllDocuments() {
         const url = `${this.apiUrl}/getall`;
         try {
-            const response = await axios.get(url);
+            const response = await axiosInstance.get(url);
             return response.data;
         } catch (error) {
             console.error('Error fetching documents:', error);

@@ -79,7 +79,7 @@ class AdminServiceTest {
     void update() {
         Admin saved1 = adminService.save(admin1);
 
-        Admin updatedAdmin = new Admin.Builder()
+        Admin updatedAdmin = new Admin.AdminBuilder()
                 .copy(saved1)
                 .setPassword("newPassword123")
                 .build();

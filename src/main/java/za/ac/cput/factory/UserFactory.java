@@ -8,16 +8,16 @@ import java.time.LocalDate;
 
 public class UserFactory {
 
-    public static User buildUser(Long userId,Name name, String gender, LocalDate dateofBirth,String password,Contact contact){
-        return new User.UserBuilder()
-                .setUserId(userId)
-                .setName(name)
-                .setGender(gender)
-                .setDateOfBirth(dateofBirth)
-                .setPassword(password)
-                .setContact(contact)
-                .build();
-    }
+//    public static User buildUser(Long userId,Name name, String gender, LocalDate dateofBirth,String password,Contact contact){
+//        return new User.UserBuilder()
+//                .setUserId(userId)
+//                .setName(name)
+//                .setGender(gender)
+//                .setDateOfBirth(dateofBirth)
+//                .setPassword(password)
+//                .setContact(contact)
+//                .build();
+//    }
 }
 
 

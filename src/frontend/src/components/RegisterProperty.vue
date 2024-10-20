@@ -6,11 +6,11 @@
       <div class="row mb-3">
         <div class="col-md-6">
           <label for="propertyName" class="form-label">Property Name</label>
-          <input type="text" class="form-control custom-border" id="propertyName" v-model="propertyName" placeholder="Property name">
+          <input type="text" class="form-control custom-border" id="propertyName" v-model="propertyName" placeholder="Property name" required>
         </div>
         <div class="col-md-6">
-          <label for="numRooms" class="form-label">Number Of Rooms</label>
-          <input type="number" class="form-control custom-border" id="numRooms" v-model="numRooms" placeholder="Number of Rooms">
+          <label for="numRooms" class="form-label" >Number Of Rooms</label>
+          <input type="number" class="form-control custom-border" id="numRooms" v-model="numRooms" placeholder="Number of Rooms" required>
         </div>
       </div>
 
@@ -18,11 +18,11 @@
       <div class="row mb-3">
         <div class="col-md-6">
           <label for="streetName1" class="form-label">Street Name</label>
-          <input type="text" class="form-control custom-border" id="streetName1" v-model="streetName1" placeholder="Street name">
+          <input type="text" class="form-control custom-border" id="streetName1" v-model="streetName1" placeholder="Street name" required>
         </div>
         <div class="col-md-6">
           <label for="suburb" class="form-label">Suburb</label>
-          <input type="text" class="form-control custom-border" id="suburb" v-model="suburb" placeholder="Suburb">
+          <input type="text" class="form-control custom-border" id="suburb" v-model="suburb" placeholder="Suburb" required>
         </div>
       </div>
 
@@ -30,15 +30,15 @@
       <div class="row mb-3">
         <div class="col-md-6">
           <label for="city" class="form-label">City</label>
-          <input type="text" class="form-control custom-border" id="city" v-model="city" placeholder="City">
+          <input type="text" class="form-control custom-border" id="city" v-model="city" placeholder="City" required>
         </div>
         <div class="col-md-6">
           <label for="postalCode" class="form-label">Postal Code</label>
-          <input type="text" class="form-control custom-border" id="postalCode" v-model="postalCode" placeholder="Postal code">
+          <input type="text" class="form-control custom-border" id="postalCode" v-model="postalCode" placeholder="Postal code" required>
         </div>
         <div class="col-md-6">
           <label for="price" class="form-label">Price Per Room</label>
-          <input type="text" class="form-control custom-border" id="price" v-model="price" placeholder="Price">
+          <input type="text" class="form-control custom-border" id="price" v-model="price" placeholder="Price" required>
         </div>
       </div>
 
@@ -52,11 +52,11 @@
           <div class="row">
             <div class="col-md-6">
               <label for="documentName" class="form-label">Document Name</label>
-              <input type="text" class="form-control" v-model="newDocument.documentName" placeholder="Document name">
+              <input type="text" class="form-control" v-model="newDocument.documentName" placeholder="Document name" required>
             </div>
             <div class="col-md-6">
               <label for="fileContents" class="form-label">Upload Document</label>
-              <input type="file" class="form-control" @change="handleFileUpload">
+              <input type="file" class="form-control" @change="handleFileUpload" required>
             </div>
           </div>
           <div v-if="formError" class="text-danger mt-2">{{ formError }}</div>

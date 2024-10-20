@@ -101,7 +101,7 @@ class LandlordControllerTest {
     @Order(3)
     void update() {
         String url = BASE_URL + "/update";
-        Landlord newLandlord = new Landlord.LandlordBuilder().copy(savedlandlord1).setPassword("Matic45678").buildLandlord();
+        Landlord newLandlord = new Landlord.LandlordBuilder().copy(savedlandlord1).setPassword("Matic45678").build();
         ResponseEntity<Landlord> postResponse = testRestTemplate.postForEntity(url, newLandlord, Landlord.class);
         assertNotNull(postResponse);
         assertNotNull(postResponse.getBody());

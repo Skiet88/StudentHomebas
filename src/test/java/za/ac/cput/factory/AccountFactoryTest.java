@@ -2,10 +2,7 @@ package za.ac.cput.factory;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import za.ac.cput.domain.Account;
-import za.ac.cput.domain.Contact;
-import za.ac.cput.domain.Name;
-import za.ac.cput.domain.User;
+import za.ac.cput.domain.*;
 
 import java.time.LocalDate;
 
@@ -26,7 +23,7 @@ public class AccountFactoryTest {
                 .setPhoneNumber("07821265349")
                 .build();
 
-        User user = new User.UserBuilder()
+        Student user = new Student.StudentBuilder()
                 .setUserId(1L)
                 .setName(name)
                 .setGender("Male")

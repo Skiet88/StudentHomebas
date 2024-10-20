@@ -1,60 +1,64 @@
+//import axiosInstance from './axiosInstance'; // Path to the axiosInstance file
+import axiosInstance from 'axios';
+
 class StudentService {
     constructor() {
         this.apiUrl = '/api/StudentHomeBas/student';
     }
 
-
-    async request(url, options) {
+    async saveStudent(student) {
+        const url = `${this.apiUrl}/save`;
         try {
-            const response = await fetch(url, options);
-            if (!response.ok) {
-                const errorDetails = await response.text();
-                throw new Error(`Network response was not ok: ${response.statusText}. Details: ${errorDetails}`);
-            }
-            return options.method === 'DELETE' ? response.text() : response.json();
+            const response = await axiosInstance.post(url, student);
+            return response.data;
         } catch (error) {
-            console.error('Fetch error:', error.message);
+            console.error('Error saving student:', error);
             throw error;
         }
     }
 
-
-    async saveStudent(student) {
-        const url = `${this.apiUrl}/save`;
-        return await this.request(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(student),
-        });
-    }
-
-
     async readStudent(studentId) {
         const url = `${this.apiUrl}/read/${studentId}`;
-        return await this.request(url, { method: 'GET' });
+        try {
+            const response = await axiosInstance.get(url);
+            return response.data;
+        } catch (error) {
+            console.error('Error reading student:', error);
+            throw error;
+        }
     }
-
 
     async updateStudent(student) {
         const url = `${this.apiUrl}/update`;
-        return await this.request(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(student),
-        });
+        try {
+            const response = await axiosInstance.put(url, student);
+            return response.data;
+        } catch (error) {
+            console.error('Error updating student:', error);
+            throw error;
+        }
     }
-
 
     async deleteStudent(studentId) {
         const url = `${this.apiUrl}/delete/${studentId}`;
-        await this.request(url, { method: 'DELETE' });
-        return studentId;
+        try {
+            await axiosInstance.delete(url);
+            return studentId; // Return the student ID to update state
+        } catch (error) {
+            console.error('Error deleting student:', error);
+            throw error;
+        }
     }
-
 
     async fetchAllStudents() {
         const url = `${this.apiUrl}/getall`;
-        return await this.request(url, { method: 'GET' });
+        try {
+            const response = await axiosInstance.get(url);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching all students:', error);
+            throw error;
+        }
     }
 }
 

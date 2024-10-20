@@ -1,62 +1,65 @@
+//import axiosInstance from './axiosInstance';
+
+import axiosInstance from 'axios';
 class LandlordService {
     constructor() {
         this.apiUrl = '/api/StudentHomeBas/landlord'; // Base URL for the Landlord API
     }
 
-    // Helper method to handle fetch requests
-    async request(url, options) {
+    async deleteLandlord(landlordId) {
+        const url = `${this.apiUrl}/delete/${landlordId}`;
         try {
-            const response = await fetch(url, options);
-            if (!response.ok) {
-                const errorDetails = await response.text();
-                throw new Error(`Network response was not ok: ${response.statusText}. Details: ${errorDetails}`);
-            }
-            return options.method === 'DELETE' ? response.text() : response.json();
+            await axiosInstance.delete(url);
+            return landlordId; // Return the landlord ID to update state
         } catch (error) {
-            console.error('Fetch error:', error.message);
+            console.error('Error deleting landlord:', error);
             throw error;
         }
     }
 
-    // Delete a Landlord by ID
-    async deleteLandlord(landlordId) {
-        const url = `${this.apiUrl}/delete/${landlordId}`;
-        await this.request(url, { method: 'DELETE' });
-        return landlordId; // Return the landlord ID so the caller can update state
-    }
-
-    // Read a Landlord by ID
     async readLandlord(landlordId) {
         const url = `${this.apiUrl}/read/${landlordId}`;
-        return await this.request(url, { method: 'GET' });
+        try {
+            const response = await axiosInstance.get(url);
+            return response.data;
+        } catch (error) {
+            console.error('Error reading landlord:', error);
+            throw error;
+        }
     }
 
-    // Save a new Landlord
     async saveLandlord(landlord) {
         const url = `${this.apiUrl}/save`;
-        return await this.request(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(landlord),
-        });
+        try {
+            const response = await axiosInstance.post(url, landlord);
+            return response.data;
+        } catch (error) {
+            console.error('Error saving landlord:', error);
+            throw error;
+        }
     }
 
-    // Update an existing Landlord
     async updateLandlord(landlord) {
         const url = `${this.apiUrl}/update`;
-        return await this.request(url, {
-            method: 'PUT', // Changed to PUT for update
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(landlord),
-        });
+        try {
+            const response = await axiosInstance.put(url, landlord);
+            return response.data;
+        } catch (error) {
+            console.error('Error updating landlord:', error);
+            throw error;
+        }
     }
 
-    // Fetch all Landlords
     async fetchAllLandlords() {
         const url = `${this.apiUrl}/getall`;
-        return await this.request(url, { method: 'GET' });
+        try {
+            const response = await axiosInstance.get(url);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching all landlords:', error);
+            throw error;
+        }
     }
 }
 
-// Export an instance of the service class for reuse
 export default new LandlordService();

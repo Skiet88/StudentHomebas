@@ -23,23 +23,23 @@ class MessageServiceTest {
 
     private MessageService messageService;
     private long landlordSenderID;
-    private long landlordRecieverID;
-    private long studentSenderID;
+    private long reciever;
+    private long sender;
     private static  String content;
 
     @BeforeEach
-    @Order(1)
+
     void setUp() {
-        landlordRecieverID = 4;
-        studentSenderID = 5;
-        content = "Heyy!";
+        reciever = 1;
+        sender = 5;
+        content = "Hey How are yu?";
     }
 
     @Test
     @Order(2)
     void sendMessage() {
         String url = BASE_URL + "/send";
-        MessageDTO message = new MessageDTO(studentSenderID , landlordRecieverID , content);
+        MessageDTO message = new MessageDTO(sender , reciever , content);
         ResponseEntity<MessageDTO> postResponse = testRestTemplate.postForEntity(url, message, MessageDTO.class);
         assertNotNull(postResponse);
         assertNotNull(postResponse.getBody());
@@ -49,7 +49,7 @@ class MessageServiceTest {
 
     @Test
     void getMessagesForUser() {
-        String url = BASE_URL + "/getmessages/" + landlordRecieverID;
+        String url = BASE_URL + "/getmessages/" + reciever;
         System.out.println(url);
 
         ResponseEntity<List> response = testRestTemplate.getForEntity(url,  List.class);

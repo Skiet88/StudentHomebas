@@ -95,7 +95,7 @@ class AdminControllerTest {
     void d_update() {
         String url = BASE_URL + "/update";
 
-        Admin updatedAdmin = new Admin.Builder()
+        Admin updatedAdmin = new Admin.AdminBuilder()
                 .copy(admin2)
                 .setPassword("newPassword123")
                 .build();

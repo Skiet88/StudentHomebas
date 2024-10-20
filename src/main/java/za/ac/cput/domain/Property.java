@@ -23,7 +23,7 @@ public class Property {
     @ManyToOne
     private Landlord landlord;
 
-    @OneToMany(mappedBy = "property", fetch = FetchType.EAGER)
+    @OneToMany( fetch = FetchType.EAGER)
     private List<Document> pictures;
 
     protected Property() {
@@ -48,6 +48,8 @@ public class Property {
     public String getPropertyName() {
         return propertyName;
     }
+
+
 
     public int getNumberOfRooms() {
         return numberOfRooms;

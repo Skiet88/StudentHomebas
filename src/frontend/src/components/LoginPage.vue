@@ -2,16 +2,19 @@
   <div class="login-overlay">
     <div class="login-container">
       <button class="close-button" @click="$emit('close')">✖</button>
-      <form class="login-form" @submit.prevent="login">
+
+      <!-- Form POSTs directly to /login on the Spring Boot backend -->
+      <form class="login-form"  @submit.prevent="login">
         <div class="form-group">
-          <label for="email">Email</label>
+          <label for="username">Email</label>
           <div class="input-container">
             <input
                 type="email"
-                id="email"
-                v-model="email"
-                placeholder="Email"
-                required
+                id="username"
+            name="username"
+            v-model="email"
+            placeholder="Email"
+            required
             />
             <i class="icon-envelope"></i>
           </div>
@@ -22,6 +25,7 @@
             <input
                 type="password"
                 id="password"
+                name="password"
                 v-model="password"
                 placeholder="Password"
                 required
@@ -40,14 +44,16 @@
           </div>
           <a href="#" class="forgot-password">Forgot Password?</a>
         </div>
+
         <button type="submit" class="btn-login">Login</button>
         <p class="signup-link">Don't have an account? <a href="#">Sign up</a></p>
       </form>
     </div>
   </div>
 </template>
-
 <script>
+import axios from "axios";
+
 export default {
   name: "LoginPage",
   data() {
@@ -55,38 +61,50 @@ export default {
       email: "",
       password: "",
       rememberMe: false
+
     };
   },
   methods: {
     async login() {
-      const url = 'api/StudentHomeBas/student/login/' + this.email + "/" + this.password;
-
+      const url = 'http://localhost:8080/StudentHomeBas/auth/login';
+      console.log(this.email);
       try {
-        const response = await fetch(url, {
-          method: 'GET',
+        const response = await axios.post(url, {
+          email: this.email,
+          password: this.password
+        }, {
           headers: {
-            'Content-Type': 'application/json'
-          },
+            'Content-Type': 'application/json',
+          }
         });
 
-        if (response.ok) {
-          const data = await response.text(); // Assuming the response is a text message
-          alert("Login successful: " + data);
-          console.log('Login successful:', data);
+        if (response.status === 200) {
+          const token = response.data.token;
+          const redirectUrl = response.data.redirectUrl;
+          localStorage.setItem('authToken', token);
           this.$emit('authenticated');
-         //await this.$router.push('/admin-layout');
+          await this.$router.push(redirectUrl);
+        //  await this.$router.push('/dashboard'); // Redirect to a general dashboard
         } else {
-          const errorMessage = await response.text();
-          alert("Login failed: " + errorMessage);
-          console.error('Login failed:', errorMessage);
+          alert('Login failed: ' + response.statusText);
         }
       } catch (error) {
-        alert("Error during login: " + error.message);
-        console.error('Error during login:', error);
+        // Display an alert with the error message received from the backend
+        alert('Error during login: ' + (error.response?.data || error.message));
       }
+    },
+
+    logout() {
+      localStorage.removeItem('authToken');
+      this.$router.push('/loginPage');
     }
   }
+  ,
+  async mounted() {
+
+     }
 };
+
 </script>
 
 <style scoped>

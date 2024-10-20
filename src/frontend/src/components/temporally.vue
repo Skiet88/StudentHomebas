@@ -8,21 +8,18 @@
               v-for="(student, index) in students"
               :key="student.id"
               href="#"
-              class="list-group-item list-group-item-action d-flex align-items-center"
+              class="list-group-item list-group-item-action"
               :class="{ active: selectedStudentIndex === index }"
               @click="selectStudent(index)"
           >
             <div class="student-icon me-2">
               {{ student.name.firstName.charAt(0).toUpperCase() }}
             </div>
-            <span>{{ student.name.firstName }}</span>
-
-
-            <span v-if="getUnreadCount(student) > 0" class="badge bg-success ms-auto">
+            {{ student.name.firstName }}
+            <span v-if="getUnreadCount(student) > 0" class="badge bg-primary ms-2">
                   {{ getUnreadCount(student) }}
             </span>
           </a>
-
         </div>
       </div>
 
@@ -104,9 +101,12 @@ export default {
     };
   },
   computed: {
-    selectedStudent() {
+    selectedStudent(index) {
+      this.selectedStudentIndex = index;
 
-      return this.students[this.selectedStudentIndex] || null;
+      // Update the last viewed timestamp for this student
+      const studentId = this.selectedStudent.id;
+      this.lastViewed[studentId] = new Date().toISOString();
     },
   },
   methods: {
@@ -133,7 +133,7 @@ export default {
         // Try to reconnect after a delay
         setTimeout(() => {
           this.setupWebSocket();
-        }, 53000);
+        }, 3000);
       };
 
       // Handle any errors
@@ -141,6 +141,7 @@ export default {
         console.error('WebSocket error:', error);
       };
     },
+
     getUnreadCount(student) {
       const lastViewedTime = this.lastViewed[student.id];
       if (!lastViewedTime) return student.messages.length; // All messages are unread if never viewed
@@ -165,10 +166,9 @@ export default {
       // Optionally, if the current student is selected, mark messages as viewed
       if (this.selectedStudent && this.selectedStudent.id === message.senderId) {
         this.lastViewed[message.senderId] = new Date().toISOString();
-
-        localStorage.setItem('lastViewed', JSON.stringify(this.lastViewed));
       }
     },
+
     pollMessages() {
       setInterval(async () => {
         await this.fetchLandlordAndConversations(this.selectedStudent?.id);
@@ -206,8 +206,8 @@ export default {
 
         this.students = Object.values(studentMap);
 
-       // if (this.students.length > 0) {
-       ///   this.selectedStudentIndex = 0;
+        // if (this.students.length > 0) {
+        ///   this.selectedStudentIndex = 0;
         //}
         // Find the index of the student that was selected before
         const previousIndex = selectedStudentId
@@ -226,23 +226,9 @@ export default {
         console.error('Error fetching landlord or conversations:', error);
       }
     },
-
     selectStudent(index) {
-      if (index >= 0 && index < this.students.length) {
-        this.selectedStudentIndex = index;
-
-        // Update the last viewed timestamp for this student
-        const studentId = this.selectedStudent.id;
-        const currentTime = new Date().toISOString();
-
-        // Update the last viewed timestamp for the selected student
-        this.lastViewed[studentId] = currentTime;
-
-        // Save lastViewed state to localStorage
-        localStorage.setItem('lastViewed', JSON.stringify(this.lastViewed));
-      }
+      this.selectedStudentIndex = index;
     },
-
     async sendMessage() {
       if (this.newMessage.trim() !== '' && this.selectedStudent) {
         const messageDTO = {
@@ -257,6 +243,7 @@ export default {
         try {
           await MessageService.sendMessage(messageDTO);
 
+          // Check if the WebSocket is open before attempting to send a message
           if (this.socket && this.socket.readyState === WebSocket.OPEN) {
             this.socket.send(JSON.stringify(messageDTO));
           } else {
@@ -264,12 +251,14 @@ export default {
             this.errorMessage = 'WebSocket connection is not available. Message may not be sent in real-time.';
           }
 
+          // Add the message to the local list
           this.selectedStudent.messages.push({
             senderId: this.landlord.userId,
             text: this.newMessage,
             timestamp: messageDTO.timestamp,
           });
 
+          // Clear any previous error messages
           this.errorMessage = '';
           this.newMessage = '';
         } catch (error) {
@@ -282,7 +271,6 @@ export default {
     },
 
 
-
     formatTimestamp(timestamp) {
       console.log("Timestamp:", timestamp); // Log the timestamp value
       const messageDate = new Date(timestamp);
@@ -290,10 +278,6 @@ export default {
     }
   },
   async mounted() {
-    const storedLastViewed = localStorage.getItem('lastViewed');
-    if (storedLastViewed) {
-      this.lastViewed = JSON.parse(storedLastViewed);
-    }
     await this.fetchLandlordAndConversations();
     this.setupWebSocket();
     this.pollMessages();

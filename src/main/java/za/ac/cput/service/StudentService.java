@@ -1,12 +1,16 @@
 package za.ac.cput.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import za.ac.cput.domain.Contact;
-import za.ac.cput.domain.Student;
+import za.ac.cput.domain.*;
 import za.ac.cput.repository.ContactRepository;
+import za.ac.cput.repository.DocumentRepository;
+import za.ac.cput.repository.RoleRepository;
 import za.ac.cput.repository.StudentRepository;
 
+import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +21,19 @@ public class StudentService implements IStudentService {
     private final ContactRepository contactRepository;
 
     @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private ContactService contactService;
+
+    @Autowired
+    private DocumentRepository documentRepository;
+
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
     public StudentService(StudentRepository studentRepository, ContactRepository contactRepository) {
         this.contactRepository = contactRepository;
         this.studentRepository = studentRepository;
@@ -24,22 +41,23 @@ public class StudentService implements IStudentService {
 
     @Override
     public Student save(Student student) {
-        Contact contact = student.getContact();
-        if (contact != null) {
-            Optional<Contact> existingContact = contactRepository.findById(contact.getEmail());
-            if (existingContact.isPresent()) {
-                contact = existingContact.get();
-            } else {
-                contact = contactRepository.save(contact);
-            }
-        }
-        Student updatedStudent = new Student.StudentBuilder()
+
+        documentRepository.saveAll(student.getDocuments());
+        contactRepository.save(student.getContact());
+
+        String encodedPassword = passwordEncoder.encode(student.getPassword());
+        Role studentRole = roleRepository.findByName("ROLE_STUDENT")
+                .orElseThrow(() -> new RuntimeException("Role not found: ROLE_STUDENT"));
+
+        Student student2 = new Student.StudentBuilder()
                 .copy(student)
-                .setContact(contact)
+                .setPassword(encodedPassword)
+                .setRoles(Collections.singleton(studentRole))
                 .build();
 
-        return studentRepository.save(updatedStudent);  // Use 'repo' to save the ComicBook
+        return studentRepository.save(student2);
     }
+
 
 
     @Override
@@ -49,21 +67,7 @@ public class StudentService implements IStudentService {
 
     @Override
     public Student update(Student student) {
-        Contact contact = student.getContact();
-        if (contact != null) {
-            Optional<Contact> existingContact = contactRepository.findById(contact.getEmail());
-            if (existingContact.isPresent()) {
-                contact = existingContact.get();
-            } else {
-                contact = contactRepository.save(contact);
-            }
-        }
-        Student updatedStudent = new Student.StudentBuilder()
-                .copy(student)
-                .setContact(contact)
-                .build();
-
-        return studentRepository.save(updatedStudent);
+        return studentRepository.save(student);
     }
 
     @Override

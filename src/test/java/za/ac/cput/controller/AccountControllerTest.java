@@ -8,10 +8,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import za.ac.cput.domain.Account;
-import za.ac.cput.domain.Contact;
-import za.ac.cput.domain.Name;
-import za.ac.cput.domain.User;
+import za.ac.cput.domain.*;
 import za.ac.cput.factory.AccountFactory;
 
 import java.time.LocalDate;
@@ -38,7 +35,7 @@ public class AccountControllerTest {
                 .setPhoneNumber("07821265349")
                 .build();
 
-        User user = new User.UserBuilder()
+        Student user = new Student.StudentBuilder()
                 .setUserId(1L)
                 .setName(name)
                 .setGender("Male")

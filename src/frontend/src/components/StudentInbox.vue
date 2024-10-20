@@ -9,16 +9,21 @@
               v-for="(landlord, index) in landlords"
               :key="landlord.id"
               href="#"
-              class="list-group-item list-group-item-action"
+              class="list-group-item list-group-item-action d-flex align-items-center"
               :class="{ active: selectedLandlordIndex === index }"
               @click="selectLandlord(index)"
           >
-            <!-- Icon with the first letter of the landlord's name -->
             <div class="landlord-icon me-2">
               {{ landlord.name.firstName.charAt(0).toUpperCase() }}
             </div>
-            {{ landlord.name.firstName }}
+            <span>{{ landlord.name.firstName }}</span>
+
+            <!-- Unread messages count badge aligned to the right -->
+            <span v-if="getUnreadCount(landlord) > 0" class="badge bg-success ms-auto">
+              {{ getUnreadCount(landlord) }}
+           </span>
           </a>
+
         </div>
       </div>
 
@@ -91,36 +96,31 @@ export default {
       student: null, // Stores student information
       landlords: [], // List of landlords who have messaged the student
       selectedLandlordIndex: 0, // Default to the first landlord
-      newMessage: '', // Model for the new message input
+      newMessage: '',
+      isSending: false,
+      lastViewed: {},
     };
   },
   computed: {
     selectedLandlord() {
-      return this.landlords[this.selectedLandlordIndex];
+      return this.landlords[this.selectedLandlordIndex] || null;
     },
   },
   methods: {
-    async fetchStudentAndConversations() {
+    async fetchStudentAndConversations(selectedLandlordId = null) {
       try {
-        // Fetch the student's data using the StudentService
-        const studentId = 1; // Use the correct student ID
+        const studentId = 1; // Use correct student ID
         this.student = await StudentService.readStudent(studentId);
-
-        // Fetch messages for the current student
         const messages = await MessageService.fetchMessagesForUser(studentId);
 
         if (messages.length === 0) {
-          // If no messages are found, clear landlords and do not display the sidebar
           this.landlords = [];
           return;
         }
 
-        // Process messages to organize by landlord
         const landlordMap = {};
         messages.forEach((message) => {
-          // Determine the other user involved in the conversation
-          const otherUser =
-              message.sender.userId === studentId ? message.receiver : message.sender;
+          const otherUser = message.sender.userId === studentId ? message.receiver : message.sender;
 
           if (!landlordMap[otherUser.userId]) {
             landlordMap[otherUser.userId] = {
@@ -130,61 +130,163 @@ export default {
             };
           }
 
-          // Add the message to the corresponding landlord
           landlordMap[otherUser.userId].messages.push({
             senderId: message.sender.userId,
             text: message.content,
+            timestamp: message.timestamp,
+
           });
+          console.log('Message timestamp:', message.timestamp);
         });
 
-        // Convert the map to an array
         this.landlords = Object.values(landlordMap);
 
-        // Default to the first landlord if available
-        if (this.landlords.length > 0) {
+        // Retain selection or select the first landlord
+        const previousIndex = selectedLandlordId
+            ? this.landlords.findIndex(landlord => landlord.id === selectedLandlordId)
+            : -1;
+
+        if (previousIndex !== -1) {
+          this.selectedLandlordIndex = previousIndex;
+        } else if (this.landlords.length > 0) {
           this.selectedLandlordIndex = 0;
         }
       } catch (error) {
         console.error('Error fetching student or conversations:', error);
       }
     },
+
+
+    updateMessages(message) {
+      const landlord = this.landlords.find(
+          l => l.id === message.senderId || l.id === message.receiverId
+      );
+
+      if (landlord) {
+        landlord.messages.push(message);
+      } else {
+        this.fetchStudentAndConversations();
+      }
+
+      // Optionally, if the current landlord is selected, mark messages as viewed
+      if (this.selectedLandlord && this.selectedLandlord.id === message.senderId) {
+        this.lastViewed[message.senderId] = new Date().toISOString();
+
+        // Save to localStorage so it's persisted across reloads
+        localStorage.setItem('lastViewed', JSON.stringify(this.lastViewed));
+      }
+    },
+
+    getUnreadCount(landlord) {
+      const lastViewedTime = this.lastViewed[landlord.id];
+      if (!lastViewedTime) return landlord.messages.length; // All messages are unread if never viewed
+
+      // Count messages with a timestamp greater than lastViewedTime
+      return landlord.messages.filter(
+          (message) => new Date(message.timestamp) > new Date(lastViewedTime)
+      ).length;
+    },
     selectLandlord(index) {
-      this.selectedLandlordIndex = index;
+      if (index >= 0 && index < this.landlords.length) {
+        this.selectedLandlordIndex = index;
+
+        // Update the last viewed timestamp for this student
+        const landlordId = this.selectedLandlord.id;
+        const currentTime = new Date().toISOString();
+
+        // Update the last viewed timestamp for the selected student
+        this.lastViewed[landlordId] = currentTime;
+
+        // Save lastViewed state to localStorage
+        localStorage.setItem('lastViewed', JSON.stringify(this.lastViewed));
+      }
     },
     async sendMessage() {
       if (this.newMessage.trim() !== '' && this.selectedLandlord) {
         const messageDTO = {
           content: this.newMessage,
-          senderId: this.student.userId, // Use the fetched student's userId
+          senderId: this.student.userId, // Use the student's userId
           receiverId: this.selectedLandlord.id, // Send to the selected landlord's userId
+          timestamp: new Date().toISOString(), // Include a timestamp for consistency
         };
 
         try {
-          // Send the message to the database
+          // Send the message to the backend service (e.g., save to the database)
           await MessageService.sendMessage(messageDTO);
 
-          // Add the message to the local state for immediate feedback
+          // Check if the WebSocket is open before attempting to send the message in real-time
+          if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+            this.socket.send(JSON.stringify(messageDTO));
+          } else {
+            console.warn('WebSocket is not open. Unable to send message.');
+            this.errorMessage = 'WebSocket connection is not available. Message may not be sent in real-time.';
+          }
+
+          // Add the message to the local state for immediate feedback in the chat
           this.selectedLandlord.messages.push({
             senderId: this.student.userId,
             text: this.newMessage,
+            timestamp: messageDTO.timestamp, // Include the timestamp
           });
 
-          // Clear the input field
+          // Clear the input field for new messages
           this.newMessage = '';
+          this.errorMessage = ''; // Clear any existing error messages
         } catch (error) {
           console.error('Error sending message:', error);
+          this.errorMessage = 'Error sending message. Please try again later.';
         }
       }
     },
+
     formatTimestamp(timestamp) {
-      console.log("Timestamp:", timestamp);
       const messageDate = new Date(timestamp);
       return messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-    }
+    },
+
+    pollMessages() {
+      setInterval(async () => {
+        await this.fetchStudentAndConversations();
+      }, 5000); // Poll every 5 seconds
+    },
+    setupWebSocket() {
+      // Assign the WebSocket instance to this.socket
+      this.socket = new WebSocket('ws://localhost:8080/ws/messages');
+
+      // Handle incoming messages
+      this.socket.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+        this.updateMessages(message);
+      };
+
+      // Handle connection open
+      this.socket.onopen = () => {
+        console.log('WebSocket connection established');
+      };
+
+      // Handle connection close
+      this.socket.onclose = () => {
+        console.warn('WebSocket connection closed. Attempting to reconnect...');
+        this.socket = null;
+
+        // Try to reconnect after a delay
+        setTimeout(() => {
+          this.setupWebSocket();
+        }, 3000);
+      };
+
+      // Handle any errors
+      this.socket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+    },
+
   },
   async mounted() {
     // Fetch the student and conversations when the component is mounted
     await this.fetchStudentAndConversations();
+    this.setupWebSocket();
+    this.pollMessages();
   },
 };
 </script>

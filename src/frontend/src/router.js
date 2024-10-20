@@ -15,7 +15,11 @@ import MainLayout from "@/components/MainLayout.vue";
 import LandLordInbox from "@/components/LandLordInbox.vue";
 
 const routes = [
-     { path: '/loginPage', name: 'LoginPage', component: LoginPage },
+    {
+        path: '/',
+        redirect: '/loginPage',
+    },
+    { path: '/loginPage', name: 'LoginPage', component: LoginPage },
     { path: '/home', name: 'HomePage', component: HomePage },
     { path: '/propertyInfo', name: 'PropertyInfoPage', component: PropertyInfoPage },
 
@@ -23,6 +27,7 @@ const routes = [
         path: '/admin-layout',
         name: 'AdminLayout',
         component: AdminLayout,
+        meta: { requiresAuth: true },
         children: [
             {
                 path: '',
@@ -49,34 +54,31 @@ const routes = [
                 name: 'Communication',
                 component: Communication,
             },
-
-
         ]
     },
     {
-    path: '/',
-   // path: '/landlord-layout',
-    name: 'MainLayout',
-    component: MainLayout,
-    children: [
-        { path: '', redirect: '/register-property' },
-        {
-            path: '/register-property',
-            name: 'RegisterProperty',
-            component: RegisterProperty
-        },
-        {
-            path: '/landlord-inbox',
-            name: 'LandLordInbox',
-            component: LandLordInbox
-        },
-        {
-            path: '/student-inbox',
-            name: 'StudentInbox',
-            component: StudentInbox
-        }
-
-    ]
+        path: '/',
+        name: 'MainLayout',
+        component: MainLayout,
+        meta: { requiresAuth: true },
+        children: [
+            { path: '', redirect: '/register-property' },
+            {
+                path: '/register-property',
+                name: 'RegisterProperty',
+                component: RegisterProperty
+            },
+            {
+                path: '/landlord-inbox',
+                name: 'LandLordInbox',
+                component: LandLordInbox
+            },
+            {
+                path: '/student-inbox',
+                name: 'StudentInbox',
+                component: StudentInbox
+            }
+        ]
     },
 ];
 
@@ -85,4 +87,12 @@ const router = createRouter({
     routes
 });
 
+router.beforeEach((to, from, next) => {
+    const isAuthenticated = !!localStorage.getItem('authToken'); // Adjust based on your auth mechanism
+    if (to.meta.requiresAuth && !isAuthenticated) {
+        next({ name: 'LoginPage' }); // Redirect to login if not authenticated
+    } else {
+        next();
+    }
+});
 export default router;

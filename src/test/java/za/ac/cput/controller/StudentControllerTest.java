@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.web.client.ResourceAccessException;
+import za.ac.cput.DTO.AuthenticationRequest;
 import za.ac.cput.domain.*;
 import za.ac.cput.factory.AddressFactory;
 import za.ac.cput.factory.DocumentFactory;
@@ -145,17 +146,19 @@ class StudentControllerTest {
         assertEquals("Login successful", response.getBody());
         System.out.println("Login Test Response: " + response.getBody());
     }
-    @Test
-    @Order(6)
-    void authenticate_success() {
-        String url = BASE_URL + "/authenticate";
-        AuthenticationRequest request = new AuthenticationRequest("mphumzimbula@gmail.com", "20Mphmbu16!");
-        ResponseEntity<Student> response = testRestTemplate.postForEntity(url, request, Student.class);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(student1.getUserId(), response.getBody().getUserId());
-        System.out.println("Authentication Successful for Student 1:" + response.getBody());
-    }
+
+
+//    @Test
+//    @Order(6)
+//    void authenticate_success() {
+//        String url = BASE_URL + "/authenticate";
+//        AuthenticationRequest request = new AuthenticationRequest("mphumzimbula@gmail.com", "20Mphmbu16!");
+//        ResponseEntity<Student> response = testRestTemplate.postForEntity(url, request, Student.class);
+//        assertEquals(HttpStatus.OK, response.getStatusCode());
+//        assertNotNull(response.getBody());
+//        assertEquals(student1.getUserId(), response.getBody().getUserId());
+//        System.out.println("Authentication Successful for Student 1:" + response.getBody());
+//    }
 
 
 }

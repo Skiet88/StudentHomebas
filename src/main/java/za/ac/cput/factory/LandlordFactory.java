@@ -28,7 +28,7 @@ public class LandlordFactory {
             .setPassword(password)
             .setContact(contact)
             .setDocuments(documents)
-            .buildLandlord();
+            .build();
 
     }
     public static Landlord buildLandlordWithMiddleName(Long landlordId, String firstName, String middleName, String lastName, String gender, LocalDate dateOfBirth, int numOfPropertiesOwned, String password, Contact contact, List<Document> documents){
@@ -50,7 +50,7 @@ public class LandlordFactory {
                 .setPassword(password)
                 .setContact(contact)
                 .setDocuments(documents)
-                .buildLandlord();
+                .build();
 
     }
 
@@ -72,7 +72,7 @@ public class LandlordFactory {
                 .setPassword(password)
                 .setContact(contact)
                 .setDocuments(documents)
-                .buildLandlord();
+                .build();
 
     }
 
